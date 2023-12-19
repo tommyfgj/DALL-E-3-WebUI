@@ -1,7 +1,17 @@
 import axios from "axios";
 import sharp from "sharp";
+import {logtoClient} from "../../lib/logto";
 
-export default async function handler(req, res) {
+export default logtoClient.withLogtoApiRoute((request, response) => {
+  if (process.env.LOGTO_ENABLE === "true" && !request.user.isAuthenticated) {
+    response.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+  handler(request, response);
+});
+
+export async function handler(req, res) {
   const url = req.body.url;
   const type = req.body.type;
 
